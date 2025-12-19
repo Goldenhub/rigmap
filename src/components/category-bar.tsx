@@ -50,7 +50,7 @@ export function CategoryBar() {
         {categories.map((cat) => {
           const Icon = cat.icon;
           const isActive = 
-            (cat.name === 'All' && !searchParams.get('category') && (!searchParams.get('sort') || searchParams.get('sort') === 'newest')) ||
+            (cat.name === 'All' && !searchParams.get('category') && (!searchParams.get('sort'))) ||
             (cat.name === 'New' && searchParams.get('sort') === 'newest' && !searchParams.get('category')) ||
             (cat.name === 'Most Liked' && searchParams.get('sort') === 'popular') ||
             (cat.name === currentCategory && cat.name !== 'Most Liked' && cat.name !== 'New' && cat.name !== 'All');
