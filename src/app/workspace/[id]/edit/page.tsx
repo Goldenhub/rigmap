@@ -51,6 +51,7 @@ export default async function EditWorkspacePage(props: PageProps) {
     description: workspace.description || '',
     imageUrl: workspace.imageUrl,
     devices: formattedDevices,
+    category: workspace.category,
   };
 
   return (
