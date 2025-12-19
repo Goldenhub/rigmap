@@ -17,6 +17,7 @@ model User {
 
   workspaces      Workspace[]
   savedWorkspaces SavedWorkspace[]
+  likes           Like[]
 }
 
 model Workspace {
@@ -25,11 +26,25 @@ model Workspace {
   title       String
   description String?
   imageUrl    String
+  category    String   @default("All")
   createdAt   DateTime @default(now())
 
   user    User             @relation(fields: [userId], references: [id])
   devices Device[]
   savedBy SavedWorkspace[]
+  likes   Like[]
+}
+
+model Like {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  workspaceId String   @db.ObjectId
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([userId, workspaceId])
 }
 
 model Device {

@@ -27,9 +27,12 @@ interface WorkspaceEditorProps {
     title: string;
     description: string;
     imageUrl: string;
+    category: string;
     devices: Device[];
   };
 }
+
+const categories = ['Gaming', 'Software Development', 'Streaming', 'Minimalist', 'Productivity', 'Creative'];
 
 export default function WorkspaceEditor({ initialData }: WorkspaceEditorProps) {
   const [state, action, isPending] = useActionState(
@@ -40,6 +43,7 @@ export default function WorkspaceEditor({ initialData }: WorkspaceEditorProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.imageUrl || null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [devices, setDevices] = useState<Device[]>(initialData?.devices || (state?.devices as Device[]) || []);
+  const [category, setCategory] = useState(initialData?.category || 'Gaming');
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -112,7 +116,7 @@ export default function WorkspaceEditor({ initialData }: WorkspaceEditorProps) {
     <div className="max-w-4xl mx-auto p-6 space-y-10">
       <div className="text-center space-y-3">
         <h1 className="text-4xl font-black text-neutral-900 leading-none italic uppercase">
-          {initialData ? 'Edit Your' : 'Share Your'} <span className="text-gradient">Workspace</span>
+          {initialData ? 'Edit Your' : 'Share Your'} <span className="text-neutral-900 border-b-4 border-neutral-900">Workspace</span>
         </h1>
         <p className="text-neutral-500 font-medium">
           {initialData ? 'Update your tags and details.' : 'Upload a photo and tag your gear.'}
@@ -130,7 +134,7 @@ export default function WorkspaceEditor({ initialData }: WorkspaceEditorProps) {
             name="title"
             required
             defaultValue={state?.title || initialData?.title}
-            className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-3 text-neutral-900 font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all shadow-sm"
+            className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-3 text-neutral-900 font-bold focus:ring-4 focus:ring-neutral-900/5 focus:border-neutral-900 outline-none transition-all shadow-sm"
             placeholder="My Productivity Setup"
           />
         </div>
@@ -142,9 +146,32 @@ export default function WorkspaceEditor({ initialData }: WorkspaceEditorProps) {
           <textarea
             name="description"
             defaultValue={state?.description || initialData?.description}
-            className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-3 text-neutral-900 font-medium focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none h-32 transition-all shadow-sm"
+            className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-3 text-neutral-900 font-medium focus:ring-4 focus:ring-neutral-900/5 focus:border-neutral-900 outline-none h-32 transition-all shadow-sm"
             placeholder="Tell us about your theme..."
           />
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-sm font-black uppercase tracking-widest text-neutral-400">
+            Category
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(cat)}
+                className={`px-6 py-2 rounded-full text-sm font-bold transition-all border ${
+                  category === cat
+                    ? 'bg-neutral-900 border-neutral-900 text-white shadow-md'
+                    : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" name="category" value={category} />
         </div>
 
         <div className="space-y-4">

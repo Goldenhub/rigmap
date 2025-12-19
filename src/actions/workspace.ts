@@ -41,6 +41,7 @@ export async function createWorkspace(prevState: any, formData: FormData) {
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
+  const category = formData.get("category") as string || "All";
   const image = formData.get("image") as File;
   const devicesJson = formData.get("devices") as string;
 
@@ -78,6 +79,7 @@ export async function createWorkspace(prevState: any, formData: FormData) {
         title,
         description,
         imageUrl,
+        category,
         devices: {
           create: deviceList.map((d: any) => ({
             name: d.name,
@@ -112,6 +114,7 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
   const id = formData.get("id") as string;
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
+  const category = formData.get("category") as string || "All";
   const image = formData.get("image") as File;
   const devicesJson = formData.get("devices") as string;
 
@@ -166,6 +169,7 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
           title,
           description,
           imageUrl,
+          category,
           devices: {
             create: deviceList.map((d: any) => ({
               name: d.name,
@@ -191,4 +195,44 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
   }
 
   redirect("/profile");
+}
+
+export async function toggleLikeWorkspace(workspaceId: string) {
+  const session = await getSession();
+  if (!session) {
+    return { error: "Unauthorized" };
+  }
+
+  const userId = session.user.id;
+
+  try {
+    const existingLike = await db.like.findUnique({
+      where: {
+        userId_workspaceId: {
+          userId,
+          workspaceId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      await db.like.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+      return { liked: false };
+    } else {
+      await db.like.create({
+        data: {
+          userId,
+          workspaceId,
+        },
+      });
+      return { liked: true };
+    }
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    return { error: "Failed to toggle like" };
+  }
 }
