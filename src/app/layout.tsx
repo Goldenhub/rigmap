@@ -33,8 +33,8 @@ export default function RootLayout({
         <SiteHeader />
         <main className="min-h-screen">
           {children}
-          <Analytics />
         </main>
+        <Analytics />
       </body>
     </html>
   );
