@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Gamepad2, Code2, Tv, Sparkles, Flame, LayoutGrid } from "lucide-react";
+import { Gamepad2, Code2, Tv, LayoutGrid } from "lucide-react";
 
 const categories = [
   { name: "All", icon: LayoutGrid },
