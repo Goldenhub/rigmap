@@ -15,9 +15,11 @@ model User {
   username     String   @unique
   createdAt    DateTime @default(now())
 
-  workspaces      Workspace[]
-  savedWorkspaces SavedWorkspace[]
-  likes           Like[]
+  workspaces       Workspace[]
+  savedWorkspaces  SavedWorkspace[]
+  likes            Like[]
+  deviceLikes      DeviceLike[]
+  savedDevices     SavedDevice[]
 }
 
 model Workspace {
@@ -52,12 +54,15 @@ model Device {
   workspaceId String  @db.ObjectId
   name        String
   description String?
+  features    String[]
   xPercent    Float
   yPercent    Float
   price       Float?
   link        String?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id])
+  likes     DeviceLike[]
+  savedBy   SavedDevice[]
 }
 
 model SavedWorkspace {
@@ -70,4 +75,28 @@ model SavedWorkspace {
   workspace Workspace @relation(fields: [workspaceId], references: [id])
 
   @@unique([userId, workspaceId])
+}
+
+model DeviceLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  deviceId  String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  device Device @relation(fields: [deviceId], references: [id])
+
+  @@unique([userId, deviceId])
+}
+
+model SavedDevice {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  deviceId  String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  device Device @relation(fields: [deviceId], references: [id])
+
+  @@unique([userId, deviceId])
 }

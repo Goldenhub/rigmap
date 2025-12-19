@@ -14,21 +14,18 @@ cloudinary.config({
 async function uploadToCloudinary(buffer: Buffer): Promise<string> {
   console.log("Starting Cloudinary upload...");
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "workspaces" },
-      (error, result) => {
-        if (error) {
-          console.error("Cloudinary upload stream error:", error);
-          return reject(error);
-        }
-        if (!result) {
-          console.error("Cloudinary upload failed: No result");
-          return reject(new Error("Upload failed"));
-        }
-        console.log("Cloudinary upload successful:", result.secure_url);
-        resolve(result.secure_url);
+    const uploadStream = cloudinary.uploader.upload_stream({ folder: "workspaces" }, (error, result) => {
+      if (error) {
+        console.error("Cloudinary upload stream error:", error);
+        return reject(error);
       }
-    );
+      if (!result) {
+        console.error("Cloudinary upload failed: No result");
+        return reject(new Error("Upload failed"));
+      }
+      console.log("Cloudinary upload successful:", result.secure_url);
+      resolve(result.secure_url);
+    });
     uploadStream.end(buffer);
   });
 }
@@ -41,7 +38,7 @@ export async function createWorkspace(prevState: any, formData: FormData) {
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const category = formData.get("category") as string || "All";
+  const category = (formData.get("category") as string) || "All";
   const image = formData.get("image") as File;
   const devicesJson = formData.get("devices") as string;
 
@@ -64,11 +61,11 @@ export async function createWorkspace(prevState: any, formData: FormData) {
     imageUrl = await uploadToCloudinary(buffer);
   } catch (error) {
     console.error("Cloudinary upload error details:", error);
-    return { 
+    return {
       error: "Failed to upload image to Cloudinary. Check your configuration.",
       title,
       description,
-      devices: deviceList
+      devices: deviceList,
     };
   }
 
@@ -84,9 +81,10 @@ export async function createWorkspace(prevState: any, formData: FormData) {
           create: deviceList.map((d: any) => ({
             name: d.name,
             description: d.description,
+            features: d.features || [],
             xPercent: d.xPercent,
             yPercent: d.yPercent,
-            price: (d.price !== "" && d.price !== null && d.price !== undefined) ? parseFloat(d.price) : null,
+            price: d.price !== "" && d.price !== null && d.price !== undefined ? parseFloat(d.price) : null,
             link: d.link,
           })),
         },
@@ -94,11 +92,11 @@ export async function createWorkspace(prevState: any, formData: FormData) {
     });
   } catch (error) {
     console.error("Database error details:", error);
-    return { 
+    return {
       error: "Failed to create workspace in database. " + (error as Error).message,
       title,
       description,
-      devices: deviceList
+      devices: deviceList,
     };
   }
 
@@ -114,7 +112,7 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
   const id = formData.get("id") as string;
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const category = formData.get("category") as string || "All";
+  const category = (formData.get("category") as string) || "All";
   const image = formData.get("image") as File;
   const devicesJson = formData.get("devices") as string;
 
@@ -122,11 +120,10 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
     return { error: "Missing required fields" };
   }
 
-
   // Verify ownership
   const existing = await db.workspace.findUnique({
     where: { id },
-    select: { userId: true, imageUrl: true }
+    select: { userId: true, imageUrl: true },
   });
 
   if (!existing || existing.userId !== session.user.id) {
@@ -150,12 +147,12 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
       imageUrl = await uploadToCloudinary(buffer);
     } catch (error) {
       console.error("Cloudinary upload error details:", error);
-      return { 
+      return {
         error: "Failed to upload new image to Cloudinary.",
         id,
         title,
         description,
-        devices: deviceList
+        devices: deviceList,
       };
     }
   }
@@ -174,9 +171,10 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
             create: deviceList.map((d: any) => ({
               name: d.name,
               description: d.description,
+              features: d.features || [],
               xPercent: d.xPercent,
               yPercent: d.yPercent,
-              price: (d.price !== "" && d.price !== null && d.price !== undefined) ? parseFloat(d.price) : null,
+              price: d.price !== "" && d.price !== null && d.price !== undefined ? parseFloat(d.price) : null,
               link: d.link,
             })),
           },
@@ -185,12 +183,12 @@ export async function updateWorkspace(prevState: any, formData: FormData) {
     ]);
   } catch (error) {
     console.error("Database error details:", error);
-    return { 
+    return {
       error: "Failed to update workspace in database. " + (error as Error).message,
       id,
       title,
       description,
-      devices: deviceList
+      devices: deviceList,
     };
   }
 
