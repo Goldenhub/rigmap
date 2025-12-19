@@ -84,7 +84,7 @@ export default function WorkspaceViewer({ workspaceId, imageUrl, devices, isSave
   };
 
   return (
-    <div className="relative w-full rounded-3xl overflow-hidden border border-white/80 bg-white/40 backdrop-blur-xl shadow-2xl shadow-indigo-500/10">
+    <div className="relative w-full rounded-3xl overflow-visible border border-white/80 bg-white/40 backdrop-blur-xl shadow-2xl shadow-indigo-500/10">
       <div className="relative flex justify-center bg-neutral-50/50 p-6">
         <img src={imageUrl} alt="Workspace" className="w-full h-auto max-h-[75vh] object-contain select-none rounded-2xl" />
 
